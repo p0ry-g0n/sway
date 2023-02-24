@@ -100,6 +100,7 @@ pub(crate) enum Pattern {
     U16(Range<u16>),
     U32(Range<u32>),
     U64(Range<u64>),
+    ArchDefaultInteger(Range<bigint::U256>),
     B256([u8; 32]),
     Boolean(bool),
     Numeric(Range<u64>),
@@ -182,6 +183,7 @@ impl Pattern {
             Literal::U16(x) => Pattern::U16(Range::from_single(x)),
             Literal::U32(x) => Pattern::U32(Range::from_single(x)),
             Literal::U64(x) => Pattern::U64(Range::from_single(x)),
+            Literal::ArchDefaultInteger(x) => Pattern::ArchDefaultInteger(Range::from_single(x)),
             Literal::B256(x) => Pattern::B256(x),
             Literal::Boolean(b) => Pattern::Boolean(b),
             Literal::Numeric(x) => Pattern::Numeric(Range::from_single(x)),
@@ -360,6 +362,16 @@ impl Pattern {
                 }
                 Pattern::U64(range.clone())
             }
+            Pattern::ArchDefaultInteger(range) => {
+                if !args.is_empty() {
+                    errors.push(CompileError::Internal(
+                        "malformed constructor request",
+                        span.clone(),
+                    ));
+                    return err(warnings, errors);
+                }
+                Pattern::ArchDefaultInteger(range.clone())
+            }
             Pattern::B256(b) => {
                 if !args.is_empty() {
                     errors.push(CompileError::Internal(
@@ -514,6 +526,7 @@ impl Pattern {
             Pattern::U16(_) => 0,
             Pattern::U32(_) => 0,
             Pattern::U64(_) => 0,
+            Pattern::ArchDefaultInteger(_) => 0,
             Pattern::B256(_) => 0,
             Pattern::Boolean(_) => 0,
             Pattern::Numeric(_) => 0,
@@ -661,6 +674,7 @@ impl Pattern {
             Pattern::U16(n) => Pattern::U16(n),
             Pattern::U32(n) => Pattern::U32(n),
             Pattern::U64(n) => Pattern::U64(n),
+            Pattern::ArchDefaultInteger(n) => Pattern::ArchDefaultInteger(n),
             Pattern::B256(n) => Pattern::B256(n),
             Pattern::Boolean(b) => Pattern::Boolean(b),
             Pattern::Numeric(n) => Pattern::Numeric(n),
@@ -717,6 +731,7 @@ impl Pattern {
             Pattern::Enum(_) => 10,
             Pattern::Tuple(_) => 11,
             Pattern::Or(_) => 12,
+            Pattern::ArchDefaultInteger(_) => 13,
         }
     }
 }
@@ -729,6 +744,7 @@ impl fmt::Display for Pattern {
             Pattern::U16(range) => format!("{range}"),
             Pattern::U32(range) => format!("{range}"),
             Pattern::U64(range) => format!("{range}"),
+            Pattern::ArchDefaultInteger(range) => format!("{range}"),
             Pattern::Numeric(range) => format!("{range}"),
             Pattern::B256(n) => format!("{n:#?}"),
             Pattern::Boolean(b) => format!("{b}"),

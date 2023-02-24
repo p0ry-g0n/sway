@@ -368,6 +368,7 @@ impl ty::TyExpression {
             Literal::U16(_) => TypeInfo::UnsignedInteger(IntegerBits::Sixteen),
             Literal::U32(_) => TypeInfo::UnsignedInteger(IntegerBits::ThirtyTwo),
             Literal::U64(_) => TypeInfo::UnsignedInteger(IntegerBits::SixtyFour),
+            Literal::ArchDefaultInteger(_) => TypeInfo::UnsignedInteger(IntegerBits::ArchDefault),
             Literal::Boolean(_) => TypeInfo::Boolean,
             Literal::B256(_) => TypeInfo::B256,
         };
@@ -1839,6 +1840,20 @@ impl ty::TyExpression {
                                 span.clone(),
                             )
                         }),
+                        new_type,
+                    ),
+                    IntegerBits::ArchDefault => (
+                        num.to_string()
+                            .parse()
+                            .map(Literal::ArchDefaultInteger)
+                            .map_err(|e| {
+                                Literal::handle_from_hex_error(
+                                    engines,
+                                    e,
+                                    TypeInfo::UnsignedInteger(IntegerBits::ArchDefault),
+                                    span.clone(),
+                                )
+                            }),
                         new_type,
                     ),
                 },

@@ -2,6 +2,7 @@ use std::{
     cmp::Ordering,
     fmt::{self, Write},
     ops::Sub,
+    str::FromStr,
 };
 
 use crate::{
@@ -83,6 +84,26 @@ impl MyMath<u64> for u64 {
     }
 }
 
+fn u256_max() -> bigint::U256 {
+    let hex = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+    bigint::U256::from_str(hex).unwrap()
+}
+
+impl MyMath<bigint::U256> for bigint::U256 {
+    fn global_max() -> bigint::U256 {
+        u256_max()
+    }
+    fn global_min() -> bigint::U256 {
+        0.into()
+    }
+
+    fn incr(&self) -> bigint::U256 {
+        *self + (Into::<bigint::U256>::into(1))
+    }
+    fn decr(&self) -> bigint::U256 {
+        *self - (Into::<bigint::U256>::into(1))
+    }
+}
 /// A `Range<T>` is a range of values of type T. Given this range:
 ///
 /// ```ignore
@@ -112,7 +133,7 @@ where
         + Clone
         + MyMath<T>
         + Sub<Output = T>
-        + Into<u64>,
+        + Into<bigint::U256>,
 {
     first: T,
     last: T,
@@ -154,6 +175,15 @@ impl Range<u64> {
     }
 }
 
+impl Range<bigint::U256> {
+    pub(crate) fn u256() -> Range<bigint::U256> {
+        Range {
+            first: bigint::U256::global_min(),
+            last: bigint::U256::global_max(),
+        }
+    }
+}
+
 impl<T> Range<T>
 where
     T: fmt::Debug
@@ -165,7 +195,7 @@ where
         + Clone
         + MyMath<T>
         + Sub<Output = T>
-        + Into<u64>,
+        + Into<bigint::U256>,
 {
     /// Creates a `Range<T>` from a single value of type `T`, where the value is used
     /// both as the lower inclusive contains and the upper inclusive contains.
@@ -529,9 +559,10 @@ where
     /// ```
     fn within_one(&self, other: &Range<T>) -> bool {
         !self.overlaps(other)
-            && (other.first > self.last && (other.first.clone() - self.last.clone()).into() == 1u64
+            && (other.first > self.last
+                && (other.first.clone() - self.last.clone()).into() == 1.into()
                 || self.first > other.last
-                    && (self.first.clone() - other.last.clone()).into() == 1u64)
+                    && (self.first.clone() - other.last.clone()).into() == 1.into())
     }
 }
 
@@ -546,7 +577,7 @@ where
         + Clone
         + MyMath<T>
         + Sub<Output = T>
-        + Into<u64>,
+        + Into<bigint::U256>,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut builder = String::new();
@@ -592,7 +623,7 @@ where
         + Clone
         + MyMath<T>
         + Sub<Output = T>
-        + Into<u64>,
+        + Into<bigint::U256>,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         use Ordering::*;
@@ -622,7 +653,7 @@ where
         + Clone
         + MyMath<T>
         + Sub<Output = T>
-        + Into<u64>,
+        + Into<bigint::U256>,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))

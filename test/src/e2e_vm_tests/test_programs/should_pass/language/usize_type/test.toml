@@ -1,0 +1,4 @@
+category = "run"
+expected_result = { action = "return", value = 2 }
+validate_abi = true
+supported_targets = ["midenvm", "evm"]

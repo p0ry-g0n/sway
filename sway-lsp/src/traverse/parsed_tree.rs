@@ -1084,6 +1084,7 @@ fn literal_to_symbol_kind(value: &Literal) -> SymbolKind {
         | Literal::U16(..)
         | Literal::U32(..)
         | Literal::U64(..)
+        | Literal::ArchDefaultInteger(..)
         | Literal::Numeric(..) => SymbolKind::NumericLiteral,
         Literal::String(..) => SymbolKind::StringLiteral,
         Literal::B256(..) => SymbolKind::ByteLiteral,

@@ -180,6 +180,37 @@ impl ConstructorFactory {
                     errors
                 )
             }
+            Pattern::ArchDefaultInteger(range) => {
+                let mut ranges = vec![range];
+                for pat in rest.into_iter() {
+                    match pat {
+                        Pattern::ArchDefaultInteger(range) => ranges.push(range),
+                        _ => {
+                            errors.push(CompileError::Internal(
+                                "expected all patterns to be of the same type",
+                                span.clone(),
+                            ));
+                            return err(warnings, errors);
+                        }
+                    }
+                }
+                let unincluded: PatStack = check!(
+                    Range::find_exclusionary_ranges(ranges, Range::u256(), span),
+                    return err(warnings, errors),
+                    warnings,
+                    errors
+                )
+                .into_iter()
+                .map(Pattern::ArchDefaultInteger)
+                .collect::<Vec<_>>()
+                .into();
+                check!(
+                    Pattern::from_pat_stack(unincluded, span),
+                    return err(warnings, errors),
+                    warnings,
+                    errors
+                )
+            }
             Pattern::U64(range) => {
                 let mut ranges = vec![range];
                 for pat in rest.into_iter() {
@@ -482,6 +513,22 @@ impl ConstructorFactory {
                     }
                 }
                 Range::do_ranges_equal_range(ranges, Range::u64(), span)
+            }
+            Pattern::ArchDefaultInteger(range) => {
+                let mut ranges = vec![range];
+                for pat in rest.into_iter() {
+                    match pat {
+                        Pattern::ArchDefaultInteger(range) => ranges.push(range),
+                        _ => {
+                            errors.push(CompileError::Internal(
+                                "expected all patterns to be of the same type",
+                                span.clone(),
+                            ));
+                            return err(warnings, errors);
+                        }
+                    }
+                }
+                Range::do_ranges_equal_range(ranges, Range::u256(), span)
             }
             Pattern::Numeric(range) => {
                 let mut ranges = vec![range];

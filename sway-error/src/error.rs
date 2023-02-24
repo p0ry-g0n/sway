@@ -614,6 +614,8 @@ pub enum CompileError {
     ConfigurableInLibrary { span: Span },
     #[error("The name `{name}` is defined multiple times")]
     NameDefinedMultipleTimes { name: String, span: Span },
+    #[error("Unable to parse hex literal.")]
+    FailedToParseHex { span: Span },
 }
 
 impl std::convert::From<TypeError> for CompileError {
@@ -780,6 +782,7 @@ impl Spanned for CompileError {
             TraitImplPayabilityMismatch { span, .. } => span.clone(),
             ConfigurableInLibrary { span } => span.clone(),
             NameDefinedMultipleTimes { span, .. } => span.clone(),
+            FailedToParseHex { span, .. } => span.clone(),
         }
     }
 }

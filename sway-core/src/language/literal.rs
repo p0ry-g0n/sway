@@ -1,5 +1,6 @@
 use crate::{type_system::*, Engines};
 
+use rustc_hex::FromHexError;
 use sway_error::error::CompileError;
 use sway_types::{integer_bits::IntegerBits, span};
 
@@ -15,6 +16,7 @@ pub enum Literal {
     U16(u16),
     U32(u32),
     U64(u64),
+    ArchDefaultInteger(bigint::U256),
     String(span::Span),
     Numeric(u64),
     Boolean(bool),
@@ -41,20 +43,24 @@ impl Hash for Literal {
                 state.write_u8(4);
                 x.hash(state);
             }
-            Numeric(x) => {
-                state.write_u8(5);
+            ArchDefaultInteger(x) => {
+                state.write_u8(6);
                 x.hash(state);
             }
-            String(inner) => {
-                state.write_u8(6);
-                inner.as_str().hash(state);
-            }
-            Boolean(x) => {
+            Numeric(x) => {
                 state.write_u8(7);
                 x.hash(state);
             }
-            B256(x) => {
+            String(inner) => {
                 state.write_u8(8);
+                inner.as_str().hash(state);
+            }
+            Boolean(x) => {
+                state.write_u8(9);
+                x.hash(state);
+            }
+            B256(x) => {
+                state.write_u8(10);
                 x.hash(state);
             }
         }
@@ -84,6 +90,7 @@ impl fmt::Display for Literal {
             Literal::U16(content) => content.to_string(),
             Literal::U32(content) => content.to_string(),
             Literal::U64(content) => content.to_string(),
+            Literal::ArchDefaultInteger(content) => content.to_string(),
             Literal::Numeric(content) => content.to_string(),
             Literal::String(content) => content.as_str().to_string(),
             Literal::Boolean(content) => content.to_string(),
@@ -98,6 +105,14 @@ impl fmt::Display for Literal {
 }
 
 impl Literal {
+    pub(crate) fn handle_from_hex_error(
+        engines: Engines<'_>,
+        e: FromHexError,
+        ty: TypeInfo,
+        span: sway_types::Span,
+    ) -> CompileError {
+        CompileError::FailedToParseHex { span }
+    }
     #[allow(clippy::wildcard_in_or_patterns)]
     pub(crate) fn handle_parse_int_error(
         engines: Engines<'_>,
@@ -132,6 +147,7 @@ impl Literal {
             Literal::U16(_) => TypeInfo::UnsignedInteger(IntegerBits::Sixteen),
             Literal::U32(_) => TypeInfo::UnsignedInteger(IntegerBits::ThirtyTwo),
             Literal::U64(_) => TypeInfo::UnsignedInteger(IntegerBits::SixtyFour),
+            Literal::ArchDefaultInteger(_) => TypeInfo::UnsignedInteger(IntegerBits::ArchDefault),
             Literal::Boolean(_) => TypeInfo::Boolean,
             Literal::B256(_) => TypeInfo::B256,
         }
