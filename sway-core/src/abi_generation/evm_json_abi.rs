@@ -80,6 +80,7 @@ pub fn json_abi_str(type_info: &TypeInfo, type_engine: &TypeEngine) -> String {
             IntegerBits::Sixteen => "uint16",
             IntegerBits::ThirtyTwo => "uint32",
             IntegerBits::SixtyFour => "uint64",
+            IntegerBits::ArchDefault => todo!("Implement arch-specific integer type for EVM"),
         }
         .into(),
         Boolean => "bool".into(),
@@ -127,6 +128,7 @@ pub fn json_abi_param_type(type_info: &TypeInfo, type_engine: &TypeEngine) -> et
             IntegerBits::Sixteen => ethabi::ParamType::Uint(16),
             IntegerBits::ThirtyTwo => ethabi::ParamType::Uint(32),
             IntegerBits::SixtyFour => ethabi::ParamType::Uint(64),
+            IntegerBits::ArchDefault => todo!("Implement arch-default integer type for EVM"),
         },
         Boolean => ethabi::ParamType::Bool,
         B256 => ethabi::ParamType::Uint(256),
