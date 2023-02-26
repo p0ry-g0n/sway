@@ -7,7 +7,7 @@ use crate::{
 
 use sway_ast::{
     attribute::Annotated,
-    expr::{ReassignmentOp, ReassignmentOpVariant},
+    expr::{asm::FuelAsmBlock, ReassignmentOp, ReassignmentOpVariant},
     ty::TyTupleDescriptor,
     AbiCastArgs, AngleBrackets, AsmBlock, Assignable, AttributeDecl, Braces, CodeBlockContents,
     CommaToken, Dependency, DoubleColonToken, Expr, ExprArrayDescriptor, ExprStructField,
@@ -2838,6 +2838,17 @@ fn asm_block_to_asm_expression(
     handler: &Handler,
     engines: Engines<'_>,
     asm_block: AsmBlock,
+) -> Result<Box<AsmExpression>, ErrorEmitted> {
+    match asm_block {
+        AsmBlock::Fuel(block) => fuel_asm_block_to_asm_expression(context, handler, engines, block),
+        AsmBlock::Miden(_) => todo!(),
+    }
+}
+fn fuel_asm_block_to_asm_expression(
+    context: &mut Context,
+    handler: &Handler,
+    engines: Engines<'_>,
+    asm_block: FuelAsmBlock,
 ) -> Result<Box<AsmExpression>, ErrorEmitted> {
     let whole_block_span = asm_block.span();
     let asm_block_contents = asm_block.contents.into_inner();

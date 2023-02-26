@@ -21,6 +21,7 @@ use sway_error::parser_error::ParseErrorKind;
 use sway_types::{Ident, Span, Spanned};
 
 mod asm;
+mod masm;
 pub mod op_code;
 
 impl ParseToEnd for AbiCastArgs {

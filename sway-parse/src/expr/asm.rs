@@ -5,17 +5,26 @@ use core::str::FromStr;
 use num_bigint::BigUint;
 
 use sway_ast::expr::asm::{
-    AsmBlock, AsmBlockContents, AsmFinalExpr, AsmImmediate, AsmRegisterDeclaration,
+    AsmBlock, AsmBlockContents, AsmFinalExpr, AsmImmediate, AsmRegisterDeclaration, FuelAsmBlock,
 };
 use sway_error::parser_error::ParseErrorKind;
 use sway_types::{Ident, Spanned};
 
 impl Parse for AsmBlock {
-    fn parse(parser: &mut Parser) -> ParseResult<AsmBlock> {
+    fn parse(parser: &mut Parser) -> ParseResult<Self>
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+}
+
+impl Parse for FuelAsmBlock {
+    fn parse(parser: &mut Parser) -> ParseResult<Self> {
         let asm_token = parser.parse()?;
         let registers = parser.parse()?;
         let contents = parser.parse()?;
-        Ok(AsmBlock {
+        Ok(Self {
             asm_token,
             registers,
             contents,
