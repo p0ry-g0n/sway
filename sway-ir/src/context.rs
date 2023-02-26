@@ -8,6 +8,7 @@
 
 use generational_arena::Arena;
 use rustc_hash::FxHashMap;
+use sway_types::BuildTarget;
 
 use crate::{
     asm::AsmBlockContent, block::BlockContent, function::FunctionContent,
@@ -29,6 +30,7 @@ pub struct Context {
     pub(crate) type_map: FxHashMap<TypeContent, Type>,
     pub(crate) asm_blocks: Arena<AsmBlockContent>,
     pub(crate) metadata: Arena<Metadatum>,
+    pub(crate) build_target: BuildTarget,
 
     next_unique_sym_tag: u64,
 }
@@ -45,6 +47,7 @@ impl Default for Context {
             type_map: Default::default(),
             asm_blocks: Default::default(),
             metadata: Default::default(),
+            build_target: BuildTarget::Fuel,
             next_unique_sym_tag: Default::default(),
         };
         Type::create_basic_types(&mut def);

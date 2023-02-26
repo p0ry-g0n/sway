@@ -353,3 +353,13 @@ impl Context {
         }
     }
 }
+
+#[derive(
+    Clone, Copy, Debug, Default, Eq, PartialEq, Hash, Serialize, Deserialize, clap::ValueEnum,
+)]
+pub enum BuildTarget {
+    #[default]
+    Fuel,
+    EVM,
+    MidenVM,
+}

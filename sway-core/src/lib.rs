@@ -25,7 +25,7 @@ use crate::{error::*, source_map::SourceMap};
 pub use asm_generation::from_ir::compile_ir_to_asm;
 use asm_generation::FinalizedAsm;
 pub use asm_generation::{CompiledBytecode, FinalizedEntry};
-pub use build_config::{BuildConfig, BuildTarget};
+pub use build_config::BuildConfig;
 use control_flow_analysis::ControlFlowGraph;
 use metadata::MetadataManager;
 use std::collections::HashMap;
@@ -38,6 +38,7 @@ use sway_ir::{
     MODULEPRINTER_NAME,
 };
 use sway_types::constants::DOC_COMMENT_ATTRIBUTE_NAME;
+pub use sway_types::BuildTarget;
 use transform::{Attribute, AttributeKind, AttributesMap};
 
 pub use semantic_analysis::namespace::{self, Namespace};

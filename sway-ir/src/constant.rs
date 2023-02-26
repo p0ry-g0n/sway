@@ -9,6 +9,11 @@ pub struct Constant {
     pub value: ConstantValue,
 }
 
+pub enum NumericValue {
+    Int(u64),
+    Big(bigint::U256),
+}
+
 /// A constant representation of each of the supported [`Type`]s.
 #[derive(Debug, Clone, DebugWithContext)]
 pub enum ConstantValue {
@@ -89,7 +94,7 @@ impl Constant {
         Value::new_constant(context, new_const)
     }
 
-    pub fn get_uint(context: &mut Context, nbits: u8, value: u64) -> Value {
+    pub fn get_uint(context: &mut Context, nbits: u8, value: NumericValue) -> Value {
         let new_const = Constant::new_uint(context, nbits, value);
         Value::new_constant(context, new_const)
     }

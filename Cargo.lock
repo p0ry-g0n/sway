@@ -5072,6 +5072,7 @@ dependencies = [
 name = "sway-types"
 version = "0.35.3"
 dependencies = [
+ "clap 3.2.23",
  "fuel-asm",
  "fuel-crypto",
  "fuel-tx",

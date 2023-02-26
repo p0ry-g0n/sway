@@ -12,6 +12,7 @@ description = "Sway core types."
 fuel-asm = { workspace = true }
 fuel-crypto = { workspace = true }
 fuel-tx = { workspace = true }
+clap = { version = "3.1", features = ["derive"] }
 lazy_static = "1.4"
 serde = { version = "1.0", features = ["derive"] }
 

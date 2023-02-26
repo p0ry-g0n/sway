@@ -22,10 +22,13 @@ pub(super) fn convert_literal_to_value(context: &mut Context, ast_literal: &Lite
         Literal::U16(n) => Constant::get_uint(context, 64, *n as u64),
         Literal::U32(n) => Constant::get_uint(context, 64, *n as u64),
         Literal::U64(n) => Constant::get_uint(context, 64, *n),
-        // TODO this could be larger than a u64, but Value  and uints in IR max out at u64. But,
-        // at this point, we don't have any knowledge of the arch. Perhaps that could be put in the context?
         Literal::ArchDefaultInteger(n) => {
-            Constant::get_uint(context, todo!("base on arch"), todo!())
+            match context.build_target {
+                // fuel uses u64s
+                BuildTarget::Fuel => Constant::get_uint(context, 64, *n),
+                BuildTarget::EVM => todo!("EVM usize type"),
+                BuildTarget::MidenVM => Constant::get_uint(context, 256, *n),
+            }
         }
         Literal::Numeric(n) => Constant::get_uint(context, 64, *n),
         Literal::String(s) => Constant::get_string(context, s.as_str().as_bytes().to_vec()),
