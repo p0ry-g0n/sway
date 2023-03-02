@@ -9,7 +9,7 @@ repository = "https://github.com/FuelLabs/sway"
 description = "Sway core language."
 
 [dependencies]
-bigint = { version = "4.4.3", features = ["std"] }
+bigint = "4.4.3"
 clap = { version = "3.1", features = ["derive"] }
 derivative = "2.2.0"
 dirs = "3.0"

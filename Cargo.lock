@@ -295,7 +295,6 @@ checksum = "c0e8c8a600052b52482eff2cf4d810e462fdff1f656ac1ecb6232132a1ed7def"
 dependencies = [
  "byteorder",
  "crunchy 0.1.6",
- "rustc-hex 1.0.0",
 ]
 
 [[package]]
@@ -1739,6 +1738,7 @@ dependencies = [
 name = "forc-pkg"
 version = "0.35.3"
 dependencies = [
+ "ansi_term",
  "anyhow",
  "fd-lock",
  "forc-tracing",
@@ -4982,6 +4982,7 @@ name = "sway-ir"
 version = "0.35.3"
 dependencies = [
  "anyhow",
+ "bigint",
  "downcast-rs",
  "filecheck",
  "generational-arena",

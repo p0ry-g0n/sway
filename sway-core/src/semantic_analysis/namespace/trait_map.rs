@@ -7,7 +7,7 @@ use sway_error::error::CompileError;
 use sway_types::{Ident, Span, Spanned};
 
 use crate::{
-    decl_engine::DeclRef,
+    decl_engine::{DeclEngineIndex, DeclRefFunction},
     engine_threading::*,
     error::*,
     language::{
@@ -600,12 +600,12 @@ impl TraitMap {
                             let decl_ref = match &item {
                                 ty::TyTraitItem::Fn(decl_ref) => decl_ref,
                             };
-                            let mut decl = decl_engine.get(decl_ref);
+                            let mut decl = decl_engine.get(decl_ref.id);
                             decl.subst(&type_mapping, engines);
                             decl.replace_self_type(engines, new_self_type);
                             let new_ref = decl_engine
-                                .insert_wrapper(decl_ref.name.clone(), decl, decl_ref.span())
-                                .with_parent(decl_engine, decl_ref);
+                                .insert(decl)
+                                .with_parent(decl_engine, decl_ref.id.into());
                             let item = match item {
                                 ty::TyTraitItem::Fn(_) => TyImplItem::Fn(new_ref),
                             };
@@ -632,7 +632,7 @@ impl TraitMap {
         &self,
         engines: Engines<'_>,
         type_id: TypeId,
-    ) -> Vec<DeclRef> {
+    ) -> Vec<DeclRefFunction> {
         let type_engine = engines.te();
         let mut methods = vec![];
         // small performance gain in bad case
@@ -669,20 +669,20 @@ impl TraitMap {
     /// - this method does not translate types from the found entries to the
     ///     `type_id` (like in `filter_by_type()`). This is because the only
     ///     entries that qualify as hits are equivalents of `type_id`
-    pub(crate) fn get_methods_for_type_and_trait_name(
+    pub(crate) fn get_items_for_type_and_trait_name(
         &self,
         engines: Engines<'_>,
         type_id: TypeId,
         trait_name: &CallPath,
-    ) -> Vec<DeclRef> {
+    ) -> Vec<ty::TyTraitItem> {
         let type_engine = engines.te();
-        let mut methods = vec![];
+        let mut items = vec![];
         // small performance gain in bad case
         if type_engine
             .get(type_id)
             .eq(&TypeInfo::ErrorRecovery, engines)
         {
-            return methods;
+            return items;
         }
         for e in self.trait_impls.iter() {
             let map_trait_name = CallPath {
@@ -693,19 +693,11 @@ impl TraitMap {
             if &map_trait_name == trait_name
                 && are_equal_minus_dynamic_types(engines, type_id, e.key.type_id)
             {
-                let mut trait_methods = e
-                    .value
-                    .values()
-                    .cloned()
-                    .into_iter()
-                    .flat_map(|item| match item {
-                        ty::TyTraitItem::Fn(decl_ref) => Some(decl_ref),
-                    })
-                    .collect::<Vec<_>>();
-                methods.append(&mut trait_methods);
+                let mut trait_items = e.value.values().cloned().into_iter().collect::<Vec<_>>();
+                items.append(&mut trait_items);
             }
         }
-        methods
+        items
     }
 
     /// Checks to see if the trait constraints are satisfied for a given type.
