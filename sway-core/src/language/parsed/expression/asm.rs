@@ -7,15 +7,27 @@ use sway_types::{ident::Ident, span::Span};
 
 #[derive(Debug, Clone)]
 pub struct AsmExpression {
-    pub registers: Vec<AsmRegisterDeclaration>,
-    pub(crate) body: Vec<AsmOp>,
-    pub(crate) returns: Option<(AsmRegister, Span)>,
+    pub(crate) content: AsmContent,
     pub(crate) return_type: TypeInfo,
     pub(crate) whole_block_span: Span,
 }
+
+#[derive(Debug, Clone)]
+pub enum AsmContent {
+    Fuel(FuelAsmExpression),
+}
+
+#[derive(Debug, Clone)]
+pub struct FuelAsmExpression {
+    pub registers: Vec<AsmRegisterDeclaration>,
+    pub(crate) body: Vec<AsmOp>,
+    pub(crate) returns: Option<(AsmRegister, Span)>,
+}
 impl AsmExpression {
     pub(crate) fn target_arch(&self) -> crate::BuildTarget {
-        todo!("Make AsmExpression an enum that can be miden or fuel")
+        match self.content {
+            AsmContent::Fuel(..) => crate::BuildTarget::Fuel,
+        }
     }
 }
 
