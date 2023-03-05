@@ -713,7 +713,6 @@ impl ty::TyExpression {
         ok(match_exp, warnings, errors)
     }
 
-    #[allow(clippy::too_many_arguments)]
     fn type_check_asm_expression(
         mut ctx: TypeCheckContext,
         asm: AsmExpression,
@@ -732,6 +731,13 @@ impl ty::TyExpression {
         // 2. Check that initialized registers are not reassigned in the `asm` block.
         check!(
             check_asm_block_validity(&asm),
+            return err(warnings, errors),
+            warnings,
+            errors
+        );
+
+        check!(
+            asm_target_check(ctx.build_target(), &asm),
             return err(warnings, errors),
             warnings,
             errors
@@ -2132,4 +2138,12 @@ fn check_asm_block_validity(asm: &AsmExpression) -> CompileResult<()> {
     );
 
     ok((), vec![], errors)
+}
+
+/// Given a build target and an asm expression, ensure that the asm lines up with the build target.
+fn asm_target_check(target: BuildTarget, asm: &AsmExpression) -> CompileResult<()> {
+    if target != asm.target_arch() {
+        todo!("return err")
+    }
+    ok((), vec![], vec![])
 }

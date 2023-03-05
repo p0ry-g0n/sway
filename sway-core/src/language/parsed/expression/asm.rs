@@ -13,6 +13,11 @@ pub struct AsmExpression {
     pub(crate) return_type: TypeInfo,
     pub(crate) whole_block_span: Span,
 }
+impl AsmExpression {
+    pub(crate) fn target_arch(&self) -> crate::BuildTarget {
+        todo!("Make AsmExpression an enum that can be miden or fuel")
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct AsmRegisterDeclaration {
